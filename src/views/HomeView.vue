@@ -22,7 +22,15 @@
             </li>
           </template>
       </ul>
-    </div>
+      </div>
+      <div class="flex flex-col gap-4">
+          <Suspense>
+              <CityList/>
+              <template #fallback>
+                <CityCardSkeleton/>
+              </template>
+          </Suspense>
+      </div>
   </div>
 </template>
 
@@ -30,6 +38,8 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
+import CityList from '@/components/CityList.vue';
+import CityCardSkeleton from '@/components/CityCardSkeleton.vue';
 
 const searchQuery = ref('');
 const queryTimeOut = ref(null);
@@ -50,7 +60,7 @@ const previewCity = (searchResult) =>{
   }
 
   router.push({ name: 'cityView', 
-  params: { country: country.replaceAll(' ', ''), city: city.replaceAll(' ','') },
+  params: { country: country.trim(), city: city.trim() },
   query: {
     lat: searchResult.geometry.coordinates[1],
     lon: searchResult.geometry.coordinates[0],

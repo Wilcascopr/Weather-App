@@ -14,7 +14,8 @@
                 hover:text-weather-secondary duration-500 cursor-pointer"
                 @click="(modal = !modal)"></i>
                 <i class="fa-solid fa-plus text-xl
-                hover:text-weather-secondary duration-500 cursor-pointer"></i>
+                hover:text-weather-secondary duration-500 cursor-pointer"
+                @click="addCity" v-if="route.query.preview"></i>
             </div>
             <BaseModal v-if="modal" @closeModal="(modal = !modal)">
                 <div class="text-black">
@@ -47,9 +48,46 @@
 
 <script setup>
 import { ref } from 'vue';
-import { RouterLink } from 'vue-router';
+import { RouterLink, useRoute, useRouter } from 'vue-router';
 import BaseModal from './BaseModal.vue';
 
 const modal = ref(false)
+const savedCities = ref([])
+const route = useRoute();
+const router = useRouter();
+
+const uID = () => {
+    const chars = 'qwert8yuiop3lkjh90gfd76sazxc54vbn12m'
+    let id = '';
+    for (let i = 0; i < 15; i++) {
+        let num =  Math.round(Math.random()*35);
+        id += chars[num];
+    }
+    return id;
+}
+
+const addCity = () => {
+    if (localStorage.getItem('savedCities')) {
+        savedCities.value = JSON.parse(localStorage.getItem('savedCities'));
+    }
+
+    const locationObj = {
+        id: uID(),
+        country: route.params.country,
+        city: route.params.city,
+        coords: {
+            lat: route.query.lat,
+            lon: route.query.lon
+        }
+    }
+
+    savedCities.value.push(locationObj);
+
+    localStorage.setItem('savedCities', JSON.stringify(savedCities.value));
+
+    let query = Object.assign({}, route.query);
+    delete query.preview;
+    router.replace({ query })
+}
 </script>
 
